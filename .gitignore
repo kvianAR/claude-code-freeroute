@@ -1,0 +1,11 @@
+# Keep local credentials and Claude Code session data off GitHub.
+.claude/*
+!.claude/settings.example.json
+
+# Local and editor files.
+.DS_Store
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc

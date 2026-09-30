@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""Start Claude Code with this project's OpenRouter environment."""
+
+import json
+import os
+import sys
+from pathlib import Path
+
+
+project = Path(__file__).resolve().parent
+settings = project / ".claude" / "settings.local.json"
+with settings.open(encoding="utf-8") as handle:
+    config = json.load(handle)
+
+environment = os.environ.copy()
+environment.update(config["env"])
+os.chdir(project)
+os.execvpe("claude", ["claude", *sys.argv[1:]], environment)
