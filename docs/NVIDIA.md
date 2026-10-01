@@ -33,3 +33,7 @@ Create `.claude/settings.local.json` with this shape. Replace the placeholder wi
 ```
 
 Run `chmod 600 .claude/settings.local.json`, then `./start-claude`. The launcher supplies the local gateway address and an ephemeral gateway token to Claude Code.
+
+## Check the route
+
+In Claude Code, run `/status`. The base URL should be a `127.0.0.1` address while the direct NVIDIA route is active. A normal reply to a short prompt confirms that Claude Code, the local gateway, and NVIDIA are connected. If `/status` still shows Anthropic billing, exit and restart with `./start-claude`.
