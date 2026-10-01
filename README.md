@@ -4,7 +4,7 @@
 
 **Run Claude Code through OpenRouter with a free model in a few minutes.**
 
-No proxy. No Docker. Just a local config and a tiny launcher.
+OpenRouter needs only a local config. Direct NVIDIA access uses an optional local LiteLLM gateway.
 
 [![OpenRouter](https://img.shields.io/badge/Powered%20by-OpenRouter-7C3AED?style=for-the-badge)](https://openrouter.ai/)
 [![Claude Code](https://img.shields.io/badge/Works%20with-Claude%20Code-D97757?style=for-the-badge)](https://docs.anthropic.com/en/docs/claude-code/overview)
@@ -89,3 +89,7 @@ The config sets the main model plus the Opus, Sonnet, Haiku, and subagent roles 
 ---
 
 <div align="center"><sub>Community setup guide. Not affiliated with Anthropic, OpenRouter, or NVIDIA.</sub></div>
+
+## 🟩 Direct NVIDIA route
+
+If you have an NVIDIA NIM API key, see the [direct NVIDIA guide](docs/NVIDIA.md). This uses NVIDIA's service and its own credits or limits. It is separate from OpenRouter's `:free` model quota. The launcher starts a local gateway for this route and stops it when Claude Code exits.
