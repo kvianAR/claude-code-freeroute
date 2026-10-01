@@ -103,8 +103,14 @@ def main():
     with SETTINGS.open(encoding="utf-8") as handle:
         config = json.load(handle)
 
+    values = config.get("env")
+    if not isinstance(values, dict) or not all(
+        isinstance(key, str) and isinstance(value, str)
+        for key, value in values.items()
+    ):
+        raise ValueError("settings.local.json needs an env object with string values")
     environment = os.environ.copy()
-    environment.update(config["env"])
+    environment.update(values)
     claude = shutil.which("claude")
     if not claude:
         raise RuntimeError("Claude Code is not installed or not on PATH")
