@@ -13,3 +13,23 @@ cp .claude/nvidia-gateway.example.yaml .claude/nvidia-gateway.yaml
 ```
 
 The launcher currently expects the gateway Python at `~/.cache/claude-nvidia-gateway/bin/python`. Keep `.claude/nvidia-gateway.yaml` local; Git ignores it.
+
+## Configure Claude Code
+
+Create `.claude/settings.local.json` with this shape. Replace the placeholder with your own NVIDIA key; never commit the resulting file.
+
+```json
+{
+  "model": "nvidia/nemotron-3-ultra-550b-a55b",
+  "env": {
+    "NVIDIA_NIM_API_KEY": "PASTE_YOUR_NVIDIA_KEY_HERE",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "nvidia/nemotron-3-ultra-550b-a55b",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "nvidia/nemotron-3-ultra-550b-a55b",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "nvidia/nemotron-3-ultra-550b-a55b",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "nvidia/nemotron-3-ultra-550b-a55b"
+  }
+}
+```
+
+Run `chmod 600 .claude/settings.local.json`, then `./start-claude`. The launcher supplies the local gateway address and an ephemeral gateway token to Claude Code.
