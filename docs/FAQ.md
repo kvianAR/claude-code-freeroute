@@ -15,3 +15,7 @@ No. The model provider sets its own pricing and limits. OpenRouter free models c
 ## Can I switch models later?
 
 Yes. Update the model IDs in your local settings and restart the launcher. Use the exact provider-specific ID; OpenRouter's `:free` suffix is not an NVIDIA NIM suffix.
+
+## What if I posted my API key in a screenshot or chat?
+
+Treat it as exposed. Revoke it at the provider, create a new key, replace the value in `.claude/settings.local.json`, and restart Claude Code. Removing a screenshot does not invalidate the old key.
