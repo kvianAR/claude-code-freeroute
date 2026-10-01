@@ -10,7 +10,7 @@ OpenRouter needs only a local config. Direct NVIDIA access uses an optional loca
 [![Claude Code](https://img.shields.io/badge/Works%20with-Claude%20Code-D97757?style=for-the-badge)](https://docs.anthropic.com/en/docs/claude-code/overview)
 [![Model](https://img.shields.io/badge/Default-Nemotron%203%20Ultra-16A34A?style=for-the-badge)](https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b%3Afree)
 
-**[Quick start](#-quick-start) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)**
+**[Quick start](#-quick-start) · [Direct NVIDIA](#-direct-nvidia-route) · [How it works](#-how-it-works) · [Troubleshooting](#-troubleshooting)**
 
 </div>
 
@@ -85,6 +85,14 @@ The config sets the main model plus the Opus, Sonnet, Haiku, and subagent roles 
 - [OpenRouter's Claude Code integration guide](https://openrouter.ai/docs/guides/coding-agents/claude-code-integration)
 - [NVIDIA Nemotron 3 Ultra free model](https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b%3Afree)
 - [Claude Code documentation](https://docs.anthropic.com/en/docs/claude-code/overview)
+
+## More guides
+
+- [OpenRouter model IDs, quota, and auth](docs/OPENROUTER.md)
+- [Direct NVIDIA setup](docs/NVIDIA.md)
+- [Shell shortcut and working directory](docs/SHELL.md)
+- [Frequently asked questions](docs/FAQ.md)
+- [Contributing](CONTRIBUTING.md) · [MIT License](LICENSE)
 
 ---
 

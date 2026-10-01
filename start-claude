@@ -115,7 +115,11 @@ def main():
     if not claude:
         raise RuntimeError("Claude Code is not installed or not on PATH")
 
-    configured_token = environment.get("NVIDIA_NIM_API_KEY") or environment.get("ANTHROPIC_AUTH_TOKEN")
+    configured_token = (
+        environment.get("NVIDIA_NIM_API_KEY")
+        or environment.get("ANTHROPIC_AUTH_TOKEN")
+        or environment.get("ANTHROPIC_API_KEY")
+    )
     if not configured_token or configured_token.startswith("PASTE_YOUR_"):
         raise ValueError("Add a provider API key to .claude/settings.local.json")
 
