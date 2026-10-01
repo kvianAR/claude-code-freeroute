@@ -9,3 +9,7 @@ Copy the exact slug from the [OpenRouter model catalog](https://openrouter.ai/mo
 ## Daily limits
 
 An OpenRouter `429` response mentioning `free-models-per-day` means the account reached its free request quota. Changing to another free model may not reset an account-wide limit. Wait for the quota to reset or review the current limits and credit options in your OpenRouter account. An NVIDIA NIM key is a separate route with separate limits.
+
+## Authentication and billing
+
+If the terminal asks for an Anthropic key or shows an Anthropic billing link, confirm you started with `./start-claude`, not bare `claude`. In Claude Code, `/status` should show `https://openrouter.ai/api`. Check that `ANTHROPIC_AUTH_TOKEN` contains your OpenRouter key and `ANTHROPIC_API_KEY` is an empty string in the local settings. Restart the process after editing the file.
