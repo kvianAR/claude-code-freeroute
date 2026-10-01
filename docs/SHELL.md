@@ -17,3 +17,7 @@ claude() {
 ```
 
 Replace the path with your actual clone location. This affects only shells that read your `~/.zshrc`; VS Code may need a new terminal window.
+
+## Working directory
+
+The launcher changes into its own repository directory before starting Claude Code. Put project files you intend to work on there, or adjust the launcher for a different workflow. Always check Claude Code's displayed working directory before granting file changes.
