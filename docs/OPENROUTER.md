@@ -13,3 +13,7 @@ An OpenRouter `429` response mentioning `free-models-per-day` means the account 
 ## Authentication and billing
 
 If the terminal asks for an Anthropic key or shows an Anthropic billing link, confirm you started with `./start-claude`, not bare `claude`. In Claude Code, `/status` should show `https://openrouter.ai/api`. Check that `ANTHROPIC_AUTH_TOKEN` contains your OpenRouter key and `ANTHROPIC_API_KEY` is an empty string in the local settings. Restart the process after editing the file.
+
+## Free model availability
+
+A listed free model can be temporarily unavailable or rate limited. Check its OpenRouter page before changing your configuration. The model also needs reliable tool use for coding work; a chat-only reply does not prove that editing and shell tools will work well.
