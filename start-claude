@@ -1,18 +1,156 @@
 #!/usr/bin/env python3
-"""Start Claude Code with this project's OpenRouter environment."""
+"""Start Claude Code with the local NVIDIA gateway or OpenRouter config."""
 
 import json
+import http.client
 import os
+import secrets
+import shutil
+import socket
+import subprocess
 import sys
+import threading
+import time
+import urllib.error
+import urllib.request
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
-project = Path(__file__).resolve().parent
-settings = project / ".claude" / "settings.local.json"
-with settings.open(encoding="utf-8") as handle:
-    config = json.load(handle)
+PROJECT = Path(__file__).resolve().parent
+SETTINGS = PROJECT / ".claude" / "settings.local.json"
+GATEWAY_CONFIG = PROJECT / ".claude" / "nvidia-gateway.yaml"
+GATEWAY_PYTHON = Path.home() / ".cache" / "claude-nvidia-gateway" / "bin" / "python"
 
-environment = os.environ.copy()
-environment.update(config["env"])
-os.chdir(project)
-os.execvpe("claude", ["claude", *sys.argv[1:]], environment)
+
+def available_port():
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]
+
+
+def wait_for_gateway(process, port):
+    url = f"http://127.0.0.1:{port}/health/liveliness"
+    for _ in range(450):
+        if process.poll() is not None:
+            raise RuntimeError("NVIDIA gateway stopped during startup")
+        try:
+            with urllib.request.urlopen(url, timeout=1) as response:
+                if response.status == 200:
+                    return
+        except (urllib.error.URLError, TimeoutError):
+            pass
+        time.sleep(0.1)
+    raise RuntimeError("NVIDIA gateway did not become ready")
+
+
+def start_request_filter(listen_port, gateway_port):
+    class Handler(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.0"
+
+        def log_message(self, _format, *args):
+            pass
+
+        def do_GET(self):
+            self.relay()
+
+        def do_POST(self):
+            self.relay()
+
+        def relay(self):
+            size = int(self.headers.get("Content-Length", "0"))
+            body = self.rfile.read(size) if size else None
+            if body and self.path.startswith("/v1/messages"):
+                try:
+                    data = json.loads(body)
+                    data.pop("output_config", None)
+                    body = json.dumps(data).encode("utf-8")
+                except (UnicodeDecodeError, ValueError):
+                    pass
+
+            headers = {
+                key: value for key, value in self.headers.items()
+                if key.lower() not in {"host", "content-length", "connection", "transfer-encoding"}
+            }
+            connection = http.client.HTTPConnection("127.0.0.1", gateway_port, timeout=600)
+            try:
+                connection.request(self.command, self.path, body=body, headers=headers)
+                response = connection.getresponse()
+                self.send_response_only(response.status, response.reason)
+                for key, value in response.getheaders():
+                    if key.lower() not in {"connection", "content-length", "transfer-encoding"}:
+                        self.send_header(key, value)
+                self.send_header("Connection", "close")
+                self.end_headers()
+                while True:
+                    chunk = response.read(8192)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+            finally:
+                connection.close()
+
+    server = ThreadingHTTPServer(("127.0.0.1", listen_port), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    return server
+
+
+def main():
+    with SETTINGS.open(encoding="utf-8") as handle:
+        config = json.load(handle)
+
+    environment = os.environ.copy()
+    environment.update(config["env"])
+    claude = shutil.which("claude")
+    if not claude:
+        raise RuntimeError("Claude Code is not installed or not on PATH")
+
+    if not environment.get("NVIDIA_NIM_API_KEY"):
+        os.chdir(PROJECT)
+        os.execvpe(claude, [claude, *sys.argv[1:]], environment)
+
+    if not GATEWAY_PYTHON.is_file() or not GATEWAY_CONFIG.is_file():
+        raise RuntimeError("NVIDIA gateway files are missing")
+
+    gateway_port = available_port()
+    listen_port = available_port()
+    environment["ANTHROPIC_BASE_URL"] = f"http://127.0.0.1:{listen_port}"
+    environment["LITELLM_MASTER_KEY"] = "sk-" + secrets.token_urlsafe(24)
+    environment["ANTHROPIC_AUTH_TOKEN"] = environment["LITELLM_MASTER_KEY"]
+    environment["ANTHROPIC_API_KEY"] = ""
+    command = [
+        str(GATEWAY_PYTHON), "-m", "litellm.proxy.proxy_cli",
+        "--config", str(GATEWAY_CONFIG),
+        "--host", "127.0.0.1", "--port", str(gateway_port),
+    ]
+    gateway = subprocess.Popen(
+        command, cwd=PROJECT, env=environment,
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+    )
+    server = None
+    try:
+        wait_for_gateway(gateway, gateway_port)
+        server = start_request_filter(listen_port, gateway_port)
+        return subprocess.call([claude, *sys.argv[1:]], cwd=PROJECT, env=environment)
+    finally:
+        if server is not None:
+            server.shutdown()
+            server.server_close()
+        gateway.terminate()
+        try:
+            gateway.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            gateway.kill()
+            gateway.wait()
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (OSError, KeyError, RuntimeError, ValueError) as error:
+        print(f"Could not start Claude Code: {error}", file=sys.stderr)
+        sys.exit(1)

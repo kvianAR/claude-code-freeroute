@@ -1,6 +1,7 @@
 # Keep local credentials and Claude Code session data off GitHub.
 .claude/*
 !.claude/settings.example.json
+!.claude/nvidia-gateway.example.yaml
 
 # Local and editor files.
 .DS_Store

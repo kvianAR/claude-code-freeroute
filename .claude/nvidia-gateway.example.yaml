@@ -1,0 +1,15 @@
+# LiteLLM configuration for the optional direct NVIDIA route.
+# Copy to .claude/nvidia-gateway.yaml after installing LiteLLM.
+model_list:
+  - model_name: nvidia/nemotron-3-ultra-550b-a55b
+    litellm_params:
+      model: nvidia_nim/nvidia/nemotron-3-ultra-550b-a55b
+      api_base: https://integrate.api.nvidia.com/v1
+      api_key: os.environ/NVIDIA_NIM_API_KEY
+      drop_params: true
+
+litellm_settings:
+  drop_params: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
