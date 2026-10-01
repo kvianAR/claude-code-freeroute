@@ -37,3 +37,13 @@ Run `chmod 600 .claude/settings.local.json`, then `./start-claude`. The launcher
 ## Check the route
 
 In Claude Code, run `/status`. The base URL should be a `127.0.0.1` address while the direct NVIDIA route is active. A normal reply to a short prompt confirms that Claude Code, the local gateway, and NVIDIA are connected. If `/status` still shows Anthropic billing, exit and restart with `./start-claude`.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Gateway files are missing | Install LiteLLM in the path above and copy the example YAML. |
+| Gateway stopped during startup | Check your Python environment and LiteLLM installation. Run `~/.cache/claude-nvidia-gateway/bin/python -m litellm.proxy.proxy_cli --help` to confirm it launches. |
+| Authentication fails | Check that `NVIDIA_NIM_API_KEY` is valid and stored inside `env` in the local JSON file. |
+| Model is unavailable | Verify the model name and access in your NVIDIA account. Availability can change. |
+| Tool calls fail | Try a supported model. Claude Code features depend on the third-party model's behavior. |
